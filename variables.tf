@@ -43,7 +43,11 @@ variable "sqs_kms_master_key_id" {
   type        = string
   default     = ""
 }
-
+variable "create_policy" {
+  type = bool
+  default = false
+  
+}
 variable "create_dlq" {
   description = "Determines whether to create SQS dead letter queue"
   type        = bool

@@ -21,7 +21,7 @@ resource "aws_sqs_queue" "this" {
   name                              = "${var.environment}-${var.sqs_name}"
   receive_wait_time_seconds         = var.receive_wait_time_seconds
   visibility_timeout_seconds        = var.visibility_timeout_seconds
-  policy = data.aws_iam_policy_document.queue.json
+  policy = var.create_policy ? data.aws_iam_policy_document.queue.json : 0
 
   tags = var.tags
 }
