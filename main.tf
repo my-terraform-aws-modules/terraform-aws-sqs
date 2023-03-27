@@ -39,7 +39,7 @@ resource "aws_sqs_queue" "dlq" {
   fifo_queue                        = var.fifo_queue
   fifo_throughput_limit             = var.fifo_throughput_limit
   kms_data_key_reuse_period_seconds = try(coalesce(var.dlq_kms_data_key_reuse_period_seconds, var.kms_data_key_reuse_period_seconds), null)
-  kms_master_key_id                 = var.enable_dlq_encryption ? var.kms_master_key_id : null
+  kms_master_key_id                 = var.enable_dlq_encryption ? var.dlq_kms_master_key_id : null
   max_message_size                  = var.max_message_size
   message_retention_seconds         = try(coalesce(var.dlq_message_retention_seconds, var.message_retention_seconds), null)
   name                              = "${var.environment}-${var.dlq_name}"
