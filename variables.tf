@@ -76,6 +76,11 @@ variable "dlq_tags" {
   default     = {}
   
 }
+variable "create_queue_policy" {
+  description = "Whether to create SQS queue policy"
+  type        = bool
+  default     = false
+}
 variable "enable_sqs_lambda_trigger" {
   description = "lambda treigger from sqs"
   type = bool
@@ -98,11 +103,7 @@ variable "create_dlq_queue_policy" {
   default     = false
 }
 
-variable "create_queue_policy" {
-  description = "Whether to create SQS queue policy"
-  type        = bool
-  default     = false
-}
+
 
 
 
