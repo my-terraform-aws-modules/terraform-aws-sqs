@@ -9,7 +9,7 @@ variable "region" {
 variable "create_sqs" {
   description = "Whether to create SQS queue"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "environment" {
