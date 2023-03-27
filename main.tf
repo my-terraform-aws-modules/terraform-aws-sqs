@@ -1,9 +1,11 @@
+provider "aws" {
+  region = var.region
+  
+}
+
 ################################################################################
 # Queue
 ################################################################################
-
-
-
 resource "aws_sqs_queue" "this" {
   count = var.create_sqs ? 1 : 0
 
@@ -17,7 +19,6 @@ resource "aws_sqs_queue" "this" {
   max_message_size                  = var.max_message_size
   message_retention_seconds         = var.message_retention_seconds
   name                              = "${var.environment}-${var.sqs_name}"
-  name_prefix                       = var.use_name_prefix ? "${local.name}-" : null
   receive_wait_time_seconds         = var.receive_wait_time_seconds
   sqs_managed_sse_enabled           = var.kms_master_key_id != null ? null : var.sqs_managed_sse_enabled
   visibility_timeout_seconds        = var.visibility_timeout_seconds
@@ -30,7 +31,7 @@ resource "aws_sqs_queue" "this" {
 ################################################################################
 
 resource "aws_sqs_queue" "dlq" {
-  count = var.create && var.create_dlq ? 1 : 0
+  count = var.create_sqs && var.create_dlq ? 1 : 0
 
   content_based_deduplication = try(coalesce(var.dlq_content_based_deduplication, var.content_based_deduplication), null)
   deduplication_scope         = try(coalesce(var.dlq_deduplication_scope, var.deduplication_scope), null)
@@ -42,14 +43,14 @@ resource "aws_sqs_queue" "dlq" {
   kms_master_key_id                 = var.enable_dlq_encryption ? var.kms_master_key_id : null
   max_message_size                  = var.max_message_size
   message_retention_seconds         = try(coalesce(var.dlq_message_retention_seconds, var.message_retention_seconds), null)
-  name                              = "${var.environment}-${var.sqs_name}"
+  name                              = "${var.environment}-${var.dlq_name}"
   receive_wait_time_seconds         = try(coalesce(var.dlq_receive_wait_time_seconds, var.receive_wait_time_seconds), null)
   visibility_timeout_seconds        = try(coalesce(var.dlq_visibility_timeout_seconds, var.visibility_timeout_seconds), null)
 
   tags = merge(var.tags, var.dlq_tags)
 }
 resource "aws_lambda_event_source_mapping" "Example" {
-  count = var.enable_sqs_lambda_trigger_enable ? 1 : 0
+  count = var.enable_sqs_lambda_trigger ? 1 : 0
   event_source_arn = aws_sqs_queue.this[0].arn
   function_name    = var.lambda_arn
 }
@@ -83,7 +84,7 @@ resource "aws_sqs_queue_policy" "this" {
   policy    = data.aws_iam_policy_document.this[0].json
 }
 data "aws_iam_policy_document" "this" {
-  count = var.create && var.create_queue_policy ? 1 : 0
+  count = var.create_sqs && var.create_queue_policy ? 1 : 0
 
   source_policy_documents   = var.source_queue_policy_documents
   override_policy_documents = var.override_queue_policy_documents
@@ -158,7 +159,7 @@ resource "aws_sqs_queue_redrive_policy" "dlq" {
 ################################################################################
 
 data "aws_iam_policy_document" "dlq" {
-  count = var.create && var.create_dlq && var.create_dlq_queue_policy ? 1 : 0
+  count = var.create_sqs && var.create_dlq && var.create_dlq_queue_policy ? 1 : 0
 
   source_policy_documents   = var.source_dlq_queue_policy_documents
   override_policy_documents = var.override_dlq_queue_policy_documents
@@ -224,7 +225,7 @@ resource "aws_sqs_queue_redrive_allow_policy" "this" {
 }
 
 resource "aws_sqs_queue_redrive_allow_policy" "dlq" {
-  count = var.create && var.create_dlq ? 1 : 0
+  count = var.create_sqs && var.create_dlq ? 1 : 0
 
   queue_url = aws_sqs_queue.dlq[0].url
   redrive_allow_policy = jsonencode(merge(

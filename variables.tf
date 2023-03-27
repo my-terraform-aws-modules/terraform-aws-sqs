@@ -1,6 +1,11 @@
 ################################################################################
                 #required parameters
 ###################################################################################
+variable "region" {
+  type = string
+  default = "eu-west-2"
+  
+}
 variable "create_sqs" {
   description = "Whether to create SQS queue"
   type        = bool
@@ -10,17 +15,17 @@ variable "create_sqs" {
 variable "environment" {
   description = "The environment to deploy to."
   type        = string
-  default     = "dev"
+  default     = ""
   validation {
     condition     = contains(["dev", "prod", "sit", "snd", "uat"], var.environment)
     error_message = "Valid values for var: environment are (dev, prod, sit, snd, uat)."
   }
 }
 
-variable "name" {
+variable "sqs_name" {
   description = "This is the human-readable name of the queue. If omitted, Terraform will assign a random name"
   type        = string
-  default     = "demo"
+  default     = ""
 }
 variable "tags" {
   description = "The tags provided by the client module. To be merged with internal tags"
@@ -47,7 +52,7 @@ variable "create_dlq" {
 variable "dlq_name" {
   description = "This is the human-readable name of the queue. If omitted, Terraform will assign a random name"
   type        = string
-  default     = "demodlq"
+  default     = ""
 }
 variable "enable_dlq_encryption" {
   type        = bool
@@ -64,18 +69,22 @@ variable "dlq_kms_master_key_id" {
 variable "dlq_tags" {
   description = "A mapping of additional tags to assign to the dead letter queue"
   type        = map(string)
-  default     = {Name = "demodlq"}
+  default     = {}
   
 }
-variable "enable_sqs_lambda_trigger_enable" {
+variable "enable_sqs_lambda_trigger" {
   description = "lambda treigger from sqs"
   type = bool
-  default = true
+  default = false
 }
 variable "lambda_arn" {
+  type = string
+  default = ""
     
 }
 variable "s3_arn" {
+  type = string
+  default = ""
   
 }
 
