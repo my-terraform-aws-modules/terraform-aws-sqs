@@ -76,7 +76,7 @@ resource "aws_sqs_queue" "dlq" {
 }
 resource "aws_lambda_event_source_mapping" "Example" {
   count = var.enable_sqs_lambda_trigger ? 1 : 0
-  event_source_arn = aws_sqs_queue.this[0].arn
+  event_source_arn = var.queue_arn
   function_name    = var.lambda_arn
 }
 

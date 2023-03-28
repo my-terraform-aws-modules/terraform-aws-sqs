@@ -86,6 +86,11 @@ variable "enable_sqs_lambda_trigger" {
   type = bool
   default = false
 }
+variable "queue_arn" {
+  type = string
+  default = ""
+    
+}
 variable "lambda_arn" {
   type = string
   default = ""
