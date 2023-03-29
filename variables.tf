@@ -3,13 +3,13 @@
 ###################################################################################
 variable "region" {
   type = string
-  default = "eu-west-2"
+  default = "eu-west-1"
   
 }
 variable "create_sqs" {
   description = "Whether to create SQS queue"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "environment" {
