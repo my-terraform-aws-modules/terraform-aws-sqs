@@ -57,7 +57,6 @@ resource "aws_sqs_queue" "dlq" {
   content_based_deduplication = try(coalesce(var.dlq_content_based_deduplication, var.content_based_deduplication), null)
   deduplication_scope         = try(coalesce(var.dlq_deduplication_scope, var.deduplication_scope), null)
   delay_seconds               = try(coalesce(var.dlq_delay_seconds, var.delay_seconds), null)
-  If source queue is FIFO, DLQ must also be FIFO and vice versa
   fifo_queue                        = var.fifo_queue
   fifo_throughput_limit             = var.fifo_throughput_limit
   kms_data_key_reuse_period_seconds = try(coalesce(var.dlq_kms_data_key_reuse_period_seconds, var.kms_data_key_reuse_period_seconds), null)

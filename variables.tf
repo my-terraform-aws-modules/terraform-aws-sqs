@@ -176,6 +176,10 @@ variable "redrive_policy" {
   type        = any
   default     = {}
 }
+variable "create_redrive_poloicy" {
+  type = bool
+  default = false
+}
 
 variable "sqs_managed_sse_enabled" {
   description = "Boolean to enable server-side encryption (SSE) of message content with SQS-owned encryption keys"
