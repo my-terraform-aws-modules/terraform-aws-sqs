@@ -70,104 +70,104 @@ resource "aws_sqs_queue" "dlq" {
 
   tags = merge(var.tags, var.dlq_tags)
 }
-################################################################################
-# Re-drive Policy
-################################################################################
+# ################################################################################
+# # Re-drive Policy
+# ################################################################################
 
-resource "aws_sqs_queue_redrive_policy" "dlq" {
-  count = var.create_sqs && var.create_dlq ? 1 : 0
+# resource "aws_sqs_queue_redrive_policy" "dlq" {
+#   count = var.create_sqs && var.create_redrive_poloicy ? 1 : 0
 
-  queue_url = aws_sqs_queue.this[0].url
-  redrive_policy = jsonencode(
-    merge(
-      {
-        deadLetterTargetArn = aws_sqs_queue.dlq[0].arn
-        maxReceiveCount     = 5
-      },
-      var.redrive_policy
-    )
-  )
-}
+#   queue_url = aws_sqs_queue.this[0].url
+#   redrive_policy = jsonencode(
+#     merge(
+#       {
+#         deadLetterTargetArn = aws_sqs_queue.dlq[0].arn
+#         maxReceiveCount     = 5
+#       },
+#       var.redrive_policy
+#     )
+#   )
+# }
 
-################################################################################
-# Queue Policy
-################################################################################
+# ################################################################################
+# # Queue Policy
+# ################################################################################
 
-data "aws_iam_policy_document" "dlq" {
-  count = var.create_sqs && var.create_dlq && var.create_dlq_queue_policy ? 1 : 0
+# data "aws_iam_policy_document" "dlq" {
+#   count = var.create_sqs && var.create_dlq && var.create_dlq_queue_policy ? 1 : 0
 
-  source_policy_documents   = var.source_dlq_queue_policy_documents
-  override_policy_documents = var.override_dlq_queue_policy_documents
+#   source_policy_documents   = var.source_dlq_queue_policy_documents
+#   override_policy_documents = var.override_dlq_queue_policy_documents
 
-  dynamic "statement" {
-    for_each = var.dlq_queue_policy_statements
+#   dynamic "statement" {
+#     for_each = var.dlq_queue_policy_statements
 
-    content {
-      sid           = try(statement.value.sid, null)
-      actions       = try(statement.value.actions, null)
-      not_actions   = try(statement.value.not_actions, null)
-      effect        = try(statement.value.effect, null)
-      resources     = try(statement.value.resources, [aws_sqs_queue.dlq[0].arn])
-      not_resources = try(statement.value.not_resources, null)
+#     content {
+#       sid           = try(statement.value.sid, null)
+#       actions       = try(statement.value.actions, null)
+#       not_actions   = try(statement.value.not_actions, null)
+#       effect        = try(statement.value.effect, null)
+#       resources     = try(statement.value.resources, [aws_sqs_queue.dlq[0].arn])
+#       not_resources = try(statement.value.not_resources, null)
 
-      dynamic "principals" {
-        for_each = try(statement.value.principals, [])
+#       dynamic "principals" {
+#         for_each = try(statement.value.principals, [])
 
-        content {
-          type        = principals.value.type
-          identifiers = principals.value.identifiers
-        }
-      }
+#         content {
+#           type        = principals.value.type
+#           identifiers = principals.value.identifiers
+#         }
+#       }
 
-      dynamic "not_principals" {
-        for_each = try(statement.value.not_principals, [])
+#       dynamic "not_principals" {
+#         for_each = try(statement.value.not_principals, [])
 
-        content {
-          type        = not_principals.value.type
-          identifiers = not_principals.value.identifiers
-        }
-      }
+#         content {
+#           type        = not_principals.value.type
+#           identifiers = not_principals.value.identifiers
+#         }
+#       }
 
-      dynamic "condition" {
-        for_each = try(statement.value.conditions, [])
+#       dynamic "condition" {
+#         for_each = try(statement.value.conditions, [])
 
-        content {
-          test     = condition.value.test
-          values   = condition.value.values
-          variable = condition.value.variable
-        }
-      }
-    }
-  }
-}
+#         content {
+#           test     = condition.value.test
+#           values   = condition.value.values
+#           variable = condition.value.variable
+#         }
+#       }
+#     }
+#   }
+# }
 
-resource "aws_sqs_queue_policy" "dlq" {
-  count = var.create_sqs && var.create_dlq && var.create_dlq_queue_policy ? 1 : 0
+# resource "aws_sqs_queue_policy" "dlq" {
+#   count = var.create_sqs && var.create_dlq && var.create_dlq_queue_policy ? 1 : 0
 
-  queue_url = aws_sqs_queue.dlq[0].url
-  policy    = data.aws_iam_policy_document.dlq[0].json
-}
+#   queue_url = aws_sqs_queue.dlq[0].url
+#   policy    = data.aws_iam_policy_document.dlq[0].json
+# }
 
-################################################################################
-# Re-drive Allow Policy
-################################################################################
+# ################################################################################
+# # Re-drive Allow Policy
+# ################################################################################
 
-resource "aws_sqs_queue_redrive_allow_policy" "this" {
-  count = var.create_sqs && !var.create_dlq && length(var.redrive_allow_policy) > 0 ? 1 : 0
+# resource "aws_sqs_queue_redrive_allow_policy" "this" {
+#   count = var.create_sqs && !var.create_dlq && length(var.redrive_allow_policy) > 0 ? 1 : 0
 
-  queue_url            = aws_sqs_queue.this[0].url
-  redrive_allow_policy = jsonencode(var.redrive_allow_policy)
-}
+#   queue_url            = aws_sqs_queue.this[0].url
+#   redrive_allow_policy = jsonencode(var.redrive_allow_policy)
+# }
 
-resource "aws_sqs_queue_redrive_allow_policy" "dlq" {
-  count = var.create_sqs && var.create_dlq ? 1 : 0
+# resource "aws_sqs_queue_redrive_allow_policy" "dlq" {
+#   count = var.create_sqs && var.create_dlq ? 1 : 0
 
-  queue_url = aws_sqs_queue.dlq[0].url
-  redrive_allow_policy = jsonencode(merge(
-    {
-      redrivePermission = "byQueue",
-      sourceQueueArns   = [aws_sqs_queue.this[0].arn]
-    },
-    var.dlq_redrive_allow_policy)
-  )
-}
+#   queue_url = aws_sqs_queue.dlq[0].url
+#   redrive_allow_policy = jsonencode(merge(
+#     {
+#       redrivePermission = "byQueue",
+#       sourceQueueArns   = [aws_sqs_queue.this[0].arn]
+#     },
+#     var.dlq_redrive_allow_policy)
+#   )
+# }

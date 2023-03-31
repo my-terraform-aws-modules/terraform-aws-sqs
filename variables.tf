@@ -2,9 +2,9 @@
                 #required parameters
 ###################################################################################
 variable "region" {
+  description = "name of the aws region"
   type = string
   default = "eu-west-1"
-  
 }
 variable "create_sqs" {
   description = "Whether to create SQS queue"
@@ -15,7 +15,7 @@ variable "create_sqs" {
 variable "environment" {
   description = "The environment to deploy to."
   type        = string
-  default     = ""
+  default     = "dev"
   validation {
     condition     = contains(["dev", "prod", "sit", "snd", "uat"], var.environment)
     error_message = "Valid values for var: environment are (dev, prod, sit, snd, uat)."
@@ -23,9 +23,9 @@ variable "environment" {
 }
 
 variable "sqs_name" {
-  description = "This is the human-readable name of the queue. If omitted, Terraform will assign a random name"
+  description = " name of the queue."
   type        = string
-  default     = ""
+  default     = "demosqs"
 }
 variable "tags" {
   description = "The tags provided by the client module. To be merged with internal tags"
@@ -43,24 +43,20 @@ variable "sqs_kms_master_key_id" {
   type        = string
   default     = ""
 }
-variable "create_policy" {
-  type = bool
-  default = false
-  
-}
+
 variable "create_dlq" {
   description = "Determines whether to create SQS dead letter queue"
   type        = bool
   default     = true
 }
 variable "dlq_name" {
-  description = "This is the human-readable name of the queue. If omitted, Terraform will assign a random name"
+  description = " name of the dead letter queue. "
   type        = string
-  default     = ""
+  default     = "demodlq"
 }
 variable "enable_dlq_encryption" {
   type        = bool
-  description = "Whether or not to use encryption for SNS Topic. If set to `true` and no custom value for KMS key (kms_master_key_id) is provided, it uses the default `alias/aws/sns` KMS key."
+  description = "Whether or not to use encryption for dlq. "
   default     = false
 }
 
@@ -73,21 +69,17 @@ variable "dlq_kms_master_key_id" {
 variable "dlq_tags" {
   description = "A mapping of additional tags to assign to the dead letter queue"
   type        = map(string)
-  default     = {}
-  
+  default     = {}  
 }
 variable "create_queue_policy" {
   description = "Whether to create SQS queue policy"
   type        = bool
   default     = false
 }
-
 variable "queue_arn" {
   type = string
-  default = ""
-    
+  default = ""   
 }
-
 variable "s3_arn" {
   type = string
   default = ""
