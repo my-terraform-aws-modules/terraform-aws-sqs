@@ -87,11 +87,7 @@ variable "queue_arn" {
   default = ""
     
 }
-variable "lambda_arn" {
-  type = string
-  default = ""
-    
-}
+
 variable "s3_arn" {
   type = string
   default = ""
