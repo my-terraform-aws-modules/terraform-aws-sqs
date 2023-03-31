@@ -81,11 +81,7 @@ variable "create_queue_policy" {
   type        = bool
   default     = false
 }
-variable "enable_sqs_lambda_trigger" {
-  description = "lambda treigger from sqs"
-  type = bool
-  default = false
-}
+
 variable "queue_arn" {
   type = string
   default = ""
